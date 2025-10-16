@@ -1,0 +1,577 @@
+openapi: 3.0.4
+info:
+  title: Путешественники
+  description: |-
+    Социальная сеть для путешественников
+  contact:
+    email: ivanzaporozhskii@gmail.com
+  version: 1.0.0
+servers:
+  - url: https://intravelling.ru/api/v1
+tags:
+  - name: Publication
+    description: Working with the publications
+  - name: Feed
+    description: Working with the feed
+  - name: Comment
+    description: Working with the comments
+  - name: Reaction
+    description: Working with the reactions
+  - name: Subscription
+    description: Working with the subscriptions
+  - name: Filesystem
+    description: Working with the files
+paths:
+  /publications:
+    post:
+      tags:
+        - Publication
+      summary: Create publication.
+      description: Create new publication
+      operationId: createPublication
+      requestBody:
+        description: Add publication in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Publication
+      summary: Finds publications for user.
+      description: Finds publications.
+      operationId: getPublications
+      parameters:
+        - name: type
+          in: query
+          description: type
+          required: true
+          schema:
+            type: string
+            enum:
+              - ME
+              - USER
+              - GEOLOCATION
+        - name: userId
+          in: query
+          description: required for USER type
+          schema:
+            type: integer
+            format: int64
+        - name: geolocation
+          in: query
+          description: required for GEOLOCATION type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicationPage'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /feed:
+    get:
+      tags:
+        - Feed
+      summary: Finds publications for current user or popular places.
+      description: Get feed
+      operationId: getFeed
+      parameters:
+        - name: type
+          in: query
+          description: type
+          required: true
+          schema:
+            type: string
+            enum:
+              - ME
+              - POPULAR
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicationPage'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /publications/{publicationId}/comments:
+    post:
+      tags:
+        - Comment
+      summary: Add comment for publication.
+      description: Add comment by userId and publicationId publication.
+      operationId: addComment
+      parameters:
+        - name: publicationId
+          in: path
+          description: ID publication
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Add comment in the publication
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Comment
+      summary: Finds comments for publication.
+      description: Finds comments by userId and publicationId publication.
+      operationId: getComments
+      parameters:
+        - name: publicationId
+          in: path
+          description: ID publication
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPage'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /publications/{publicationId}/reactions:
+    post:
+      tags:
+        - Reaction
+      summary: Add reaction for publication.
+      description: Add reaction by userId and publicationId publication.
+      operationId: addReaction
+      parameters:
+        - name: publicationId
+          in: path
+          description: ID publication
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Reaction
+      summary: Finds reactions for publication.
+      description: Finds reactions by userId and publicationId publication.
+      operationId: getReactions
+      parameters:
+        - name: publicationId
+          in: path
+          description: ID publication
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionCount'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /subscriptions:
+    post:
+      tags:
+        - Subscription
+      summary: Subscription to User.
+      description: Subscription by userId.
+      operationId: addSubscription
+      parameters:
+        - name: userId
+          in: query
+          description: ID user for subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Subscription
+      summary: Get subscriptions.
+      description: Subscriptions current user.
+      operationId: getSubscription
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionPage"
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /filestorage/uploads:
+    post:
+      tags:
+        - Filesystem
+      summary: Uploads an image.
+      description: Upload image of the publication.
+      operationId: uploadFile
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        '400':
+          description: No file uploaded
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    PublishRequest:
+      required:
+        - createdAt
+      type: object
+      properties:
+        description:
+          type: string
+        geolocation:
+          type: string
+        attaches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attach"
+    PublishResponse:
+      type: object
+      properties:
+        publishId:
+          type: string
+        description:
+          type: string
+        geolocation:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        reactionCount:
+          type: integer
+          format: int64
+        attaches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attach"
+    PublicationPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublishResponse'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Comment:
+      type: object
+      properties:
+        commentId:
+          type: string
+        description:
+          type: string
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CommentRequest:
+      type: object
+      properties:
+        description:
+          type: string
+    CommentPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ReactionCount:
+      type: object
+      properties:
+        reactionCount:
+          type: integer
+          format: int64
+    UploadImageResponse:
+      type: object
+      properties:
+        imageId:
+          type: integer
+          format: int32
+        url:
+          type: string
+      xml:
+        name: '##default'
+    Attach:
+      type: object
+      properties:
+        imageId:
+          type: integer
+          format: int32
+        url:
+          type: string
+    Subscription:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        userId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+    SubscriptionPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      properties:
+        pageIndex:
+          type: integer
+          description: Номер текущей страницы
+          example: 0
+        recordsPerPage:
+          type: integer
+          description: Количество записей на странице
+          example: 5
+        totalRecords:
+          type: integer
+          description: Общее количество записей
+          example: 30
+        totalPages:
+          type: integer
+          description: Общее количество страниц
+          example: 6
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        time:
+          type: string
+          format: date-time
+      required:
+        - code
+        - message
+        - time
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
