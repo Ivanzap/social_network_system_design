@@ -73,16 +73,16 @@ paths:
             enum:
               - ME
               - USER
-              - GEOLOCATION
+              - LOCATION
         - name: userId
           in: query
           description: required for USER type
           schema:
             type: integer
             format: int64
-        - name: geolocation
+        - name: location
           in: query
-          description: required for GEOLOCATION type
+          description: required for LOCATION type
           schema:
             type: string
       responses:
@@ -429,7 +429,7 @@ components:
       properties:
         description:
           type: string
-        geolocation:
+        location:
           type: string
         attaches:
           type: array
@@ -442,7 +442,7 @@ components:
           type: string
         description:
           type: string
-        geolocation:
+        location:
           type: string
         createdAt:
           type: string

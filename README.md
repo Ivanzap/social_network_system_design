@@ -1,7 +1,6 @@
 # System Design социальной сети для курса по System Design
 
 ***
-## Домашнее задание №1
 
 ### Функциональные требования
 - У пользователя есть личный профиль.
@@ -107,11 +106,121 @@
   - RPS = 10_000_000 / (24 * 60 * 60) = 120
   - Traffic = 230 * 5 * 1200b = 1.5 MB/s
   - Traffic(media) = 230 * 5 * (3 * 1_000_000b) = 3.5 GB/s
+- Открытие оценок (read):
+  - RPS = 950 (сумма открытия постов)
+  - Traffic = 950 * 20b = 20 KB/s
 
 Система направлена на чтение данных
 
 ### Количество соединений
 Connections = 10_000_000 * 10% = 1_000_000 соединений
   - где 10% - количество активных пользователей
+
+***
+
+### Расчет количества дисков
+
+  Disks_for_capacity = capacity / disk_capacity
+  Disks_for_throughput = traffic_per_second / disk_throughput
+  Disks_for_iops = iops / disk_iops
+  Disks = max(ceil(Disks_for_capacity), ceil(Disks_for_throughput), ceil(Disks_for_iops))
+
+### Посты
+
+  RPS = 17 + 600 + 230 + 120 = 967 RPS
+  Traffic = 0.255 GB/s + 9 GB/s + 7 GB/s + 3.5 GB/s = 20 GB/s
+  Capacity = 255 Mb/s * 86400 * 365 = 22 Tb/d * 365 = 8_000 Tb
+
+#### HDD
+  - Disks_for_capacity = 8_000 Tb / 32 Tb = 250 disks
+  - Disks_for_throughput = 20_000 Mb/s / 100 Mb/s = 200 disks
+  - Disks_for_iops = 967 / 100 = 10 disks
+  - Disks = 250 disks
+
+#### SSD(SATA)
+   - Disks_for_capacity = 8_000 Tb / 100 Tb = 80 disks
+   - Disks_for_throughput = 20_000 Mb/s / 1000 Mb/s = 20 disks
+   - Disks_for_iops = 967 / 500 = 2 disks
+   - Disks = 80 disks
+
+#### SSD(nVME)
+   - Disks_for_capacity = 8_000 Tb / 30 Tb = 270 disks
+   - Disks_for_throughput = 20_000 Mb/s / 10000 Mb/s = 2 disks
+   - Disks_for_iops = 967 / 3_000 = 1 disks
+   - Disks = 270 disks
+
+### Комментарии
+
+  RPS = 360 + 1200 = 1560 RPS
+  Traffic = 90 KB/s + 600 KB/s = 690 KB/s
+  Capacity = 90 KB/s * 86400 * 365 = 3 Tb
+
+#### HDD
+  - Disks_for_capacity = 3 Tb / 32 Tb = 1 disks
+  - Disks_for_throughput = 690 KB/s / 100 Mb/s = 1 disks
+  - Disks_for_iops = 1560 / 100 = 16 disks
+  - Disks = 16 disks
+
+#### SSD(SATA)
+   - Disks_for_capacity = 3 Tb / 100 Tb = 1 disks
+   - Disks_for_throughput = 690 KB/s / 1000 Mb/s = 1 disks
+   - Disks_for_iops = 1560 / 500 = 3 disks
+   - Disks = 3 disks
+
+#### SSD(nVME)
+   - Disks_for_capacity = 3 Tb / 30 Tb = 1 disks
+   - Disks_for_throughput = 690 KB/s / 10000 Mb/s = 1 disks
+   - Disks_for_iops = 1560 / 3_000 = 1 disks
+   - Disks = 1 disks
+
+### Оценки
+
+  RPS = 1200 RPS
+  Traffic = 120 KB/s
+  Capacity = 120 KB/s * 86400 * 365 = 3.5 Tb
+
+#### HDD
+  - Disks_for_capacity = 3.5 Tb / 32 Tb = 1 disks
+  - Disks_for_throughput = 120 KB/s / 100 Mb/s = 1 disks
+  - Disks_for_iops = 1200 / 100 = 12 disks
+  - Disks = 12 disks
+
+#### SSD(SATA)
+   - Disks_for_capacity = 3.5 Tb / 100 Tb = 1 disks
+   - Disks_for_throughput = 120 KB/s / 1000 Mb/s = 1 disks
+   - Disks_for_iops = 1200 / 500 = 3 disks
+   - Disks = 3 disks
+
+#### SSD(nVME)
+   - Disks_for_capacity = 3.5 Tb / 30 Tb = 1 disks
+   - Disks_for_throughput = 120 KB/s / 10000 Mb/s = 1 disks
+   - Disks_for_iops = 1200 / 3_000 = 1 disks
+   - Disks = 1 disks
+
+***
+### Оценки (Если есть чтение через отдельный api, а не через api открытия постов)
+
+RPS = 2150 RPS
+Traffic = 140 KB/s
+Capacity = 140 KB/s * 86400 * 365 = 4 Tb
+
+#### HDD
+- Disks_for_capacity = 4 Tb / 32 Tb = 1 disks
+- Disks_for_throughput = 140 KB/s / 100 Mb/s = 1 disks
+- Disks_for_iops = 2150 / 100 = 22 disks
+- Disks = 22 disks
+
+#### SSD(SATA)
+- Disks_for_capacity = 4 Tb / 100 Tb = 1 disks
+- Disks_for_throughput = 140 KB/s / 1000 Mb/s = 1 disks
+- Disks_for_iops = 2150 / 500 = 5 disks
+- Disks = 5 disks
+
+#### SSD(nVME)
+- Disks_for_capacity = 4 Tb / 30 Tb = 1 disks
+- Disks_for_throughput = 140 KB/s / 10000 Mb/s = 1 disks
+- Disks_for_iops = 2150 / 3_000 = 1 disks
+- Disks = 1 disks
+***
 
 ***
