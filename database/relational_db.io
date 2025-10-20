@@ -1,4 +1,5 @@
 //Сущности для реляционной БД
+//image храним в blob storage
 
 Table users {
   id bigint [primary key, unique, increment]
