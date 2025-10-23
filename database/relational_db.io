@@ -1,13 +1,13 @@
-//Сущности для реляционной БД
+//Сущности для реляционной БД (как вариант разделить на 3 БД: посты/комментарии/подписки)
 //image храним в blob storage
 
-Table users {
+Table users { //1
   id bigint [primary key, unique, increment]
   username varchar(60) [not null]
   created_at timestamp [not null, default: 'now']
 }
 
-Table publications {
+Table publications { //1
   id bigint [primary key, unique, increment]
   user_id bigint [not null]
   description text(1000) [note: 'Content of the post']
@@ -21,7 +21,7 @@ Table publications {
 }
 Ref user_publications: publications.user_id > users.id // many-to-one
 
-Table comments {
+Table comments { //2
   id numeric(20,0) [primary key, unique, increment]
   publication_id bigint [not null]
   author_user_id bigint [not null]
@@ -34,7 +34,7 @@ Table comments {
 Ref user_comments: comments.author_user_id > users.id
 Ref publication_comments: comments.publication_id > publications.id
 
-Table subscriptions {
+Table subscriptions { //3
   id bigint [primary key, unique, increment]
   user_id bigint [not null]
   subscriber_user_id bigint [not null]
@@ -48,7 +48,7 @@ Table subscriptions {
 Ref user_subscriptions: subscriptions.user_id > users.id // many-to-one
 Ref user_subscriptions: subscriptions.subscriber_user_id > users.id // many-to-one
 
-Table attaches {
+Table attaches { //1
   id bigint [primary key, unique]
   user_id bigint [not null]
   publication_id bigint [not null]

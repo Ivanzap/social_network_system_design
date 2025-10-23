@@ -173,6 +173,30 @@ Connections = 10_000_000 * 10% = 1_000_000 соединений
    - Disks_for_iops = 1560 / 3_000 = 1 disks
    - Disks = 1 disks
 
+### Подписки
+
+  RPS = 120
+  Traffic = 24 KB/s
+  Capacity = 24 KB/s * 86400 * 365 = 1 Tb
+
+#### HDD
+  - Disks_for_capacity = 1 Tb / 32 Tb = 1 disks
+  - Disks_for_throughput = 24 KB/s / 100 Mb/s = 1 disks
+  - Disks_for_iops = 120 / 100 = 2 disks
+  - Disks = 2 disks
+
+#### SSD(SATA)
+   - Disks_for_capacity = 1 Tb / 100 Tb = 1 disks
+   - Disks_for_throughput = 24 KB/s / 1000 Mb/s = 1 disks
+   - Disks_for_iops = 120 / 500 = 1 disks
+   - Disks = 1 disks
+
+#### SSD(nVME)
+   - Disks_for_capacity = 1 Tb / 30 Tb = 1 disks
+   - Disks_for_throughput = 24 KB/s / 10000 Mb/s = 1 disks
+   - Disks_for_iops = 120 / 3_000 = 1 disks
+   - Disks = 1 disks
+
 ### Оценки
 
   RPS = 1200 RPS
